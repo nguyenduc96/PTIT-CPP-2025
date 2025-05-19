@@ -1,5 +1,6 @@
 #include "DatabaseManager.h"
 #include <iostream>
+#include "../crypto/Password.h"
 
 using namespace std;
 
@@ -48,6 +49,30 @@ void DatabaseManager::init_table()
                       "balance INTEGER DEFAULT 1000,"
                       "FOREIGN KEY(username) REFERENCES users(username));";
     exec_sql(sql);
+
+    // Create default admin account if it doesn't exist
+    string checkAdmin = "SELECT 1 FROM users WHERE username = 'ptit2025';";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db, checkAdmin.c_str(), -1, &stmt, nullptr);
+    if (rc == SQLITE_OK)
+    {
+        if (sqlite3_step(stmt) != SQLITE_ROW)
+        {
+            // Hash the admin password
+            string hashedPassword = crypto::Password::hash("ptit2025");
+
+            // Admin account doesn't exist, create it
+            string adminSql = "INSERT INTO users (username, password, full_name, email, is_admin, force_change_password) "
+                              "VALUES ('ptit2025', '" +
+                              hashedPassword + "', 'Admin', 'admin@ptit.edu.vn', 1, 0);";
+            exec_sql(adminSql);
+
+            // Initialize admin wallet
+            string walletSql = "INSERT INTO wallets (username, balance) VALUES ('ptit2025', 1000);";
+            exec_sql(walletSql);
+        }
+        sqlite3_finalize(stmt);
+    }
 }
 
 bool DatabaseManager::exec_sql(const string &sql)
