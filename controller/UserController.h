@@ -12,6 +12,7 @@
 #include "../model/UserAccount.h"
 #include "../model/OTPManager.h"
 #include "../model/DatabaseManager.h"
+#include "../crypto/Password.h"
 
 class UserController
 {
