@@ -3,6 +3,14 @@ project(Reward_Wallet)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Add SQLite source files
+add_library(sqlite3 STATIC
+    sqlite/sqlite3.c
+)
+
+# Add include directories
+include_directories(${CMAKE_SOURCE_DIR}/sqlite)
+
 add_executable(Reward_Wallet main.cpp
         model/UserAccount.cpp
         model/UserAccount.h
@@ -20,4 +28,9 @@ add_executable(Reward_Wallet main.cpp
         view/CommonPage.h
         utils/FileUtils.cpp
         utils/FileUtils.h
+        model/DatabaseManager.cpp
+        model/DatabaseManager.h
 )
+
+# Link SQLite3
+target_link_libraries(Reward_Wallet PRIVATE sqlite3)

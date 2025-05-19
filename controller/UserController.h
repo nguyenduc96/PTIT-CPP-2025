@@ -5,58 +5,36 @@
 #ifndef USERCONTROLLER_H
 #define USERCONTROLLER_H
 
-
-
 #pragma once
 #include <iostream>
-
+#include <vector>
+#include <random>
 #include "../model/UserAccount.h"
 #include "../model/OTPManager.h"
+#include "../model/DatabaseManager.h"
 
-class UserController {
+class UserController
+{
+private:
+    DatabaseManager db_manager;
     std::vector<UserAccount> users;
+    std::string generateRandomPassword(int length = 10);
+
 public:
+    UserController();
     void loadUsersFromFile();
     void listAllAccount();
     void displayUser(UserAccount user_account);
     bool createAccount(UserAccount user);
     bool createAccountByAdmin(const UserAccount &user);
-    bool userExists(const std::string& username);
-    bool updatePersonalInfo(UserAccount user, const std::string& newEmail);
-    bool changePasswordWithUsername(const std::string& username, const std::string& oldPass, const std::string& newPass, const std::string& reNewPass);
+    bool userExists(const std::string &username);
+    bool updatePersonalInfo(UserAccount user, const std::string &newEmail);
+    bool changePasswordWithUsername(const std::string &username, const std::string &oldPass,
+                                    const std::string &newPass, const std::string &reNewPass);
     bool changePassword(const UserAccount &user_account);
-    UserAccount* login(const std::string& username, const std::string& password);
-    UserAccount* getUserByUsername(const std::string& username);
-    bool changePasswordWithOTP(UserAccount& user) {
-        std::string otp = OTPManager::generateOTP();
-        OTPManager::sendOTP(otp, user.username1());
-        std::cout << "Nhập mã OTP: ";
-        std::string userInput;
-        std::cin >> userInput;
-
-        if (!OTPManager::validateOTP(userInput, otp)) {
-            std::cout << "Mã OTP không đúng. Hủy thao tác.\n";
-            return false;
-        }
-
-        std::string newPassword;
-        std::cout << "Nhập mật khẩu mới: ";
-        std::cin >> newPassword;
-
-        user.set_force_change_password(false);
-        std::cout << "Đổi mật khẩu thành công!\n";
-        return true;
-    }
-
-private:
-    std::string hashPassword(const std::string& raw) {
-        std::hash<std::string> hasher;
-        return std::to_string(hasher(raw));
-    }
-
+    UserAccount *login(const std::string &username, const std::string &password);
+    UserAccount *getUserByUsername(const std::string &username);
+    bool changePasswordWithOTP(UserAccount &user);
 };
 
-
-
-
-#endif //USERCONTROLLER_H
+#endif // USERCONTROLLER_H

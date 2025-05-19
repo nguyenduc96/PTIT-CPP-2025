@@ -11,3 +11,5 @@
 *.log.*.*.*
 *debug*
 .*
+*.vcxproj
+*.sln

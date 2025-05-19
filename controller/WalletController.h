@@ -9,49 +9,60 @@
 
 #include "../model/OTPManager.h"
 #include "../model/UserAccount.h"
+#include "../model/DatabaseManager.h"
 
-class WalletController {
+class WalletController
+{
+private:
+    DatabaseManager &db_manager;
+
 public:
-    bool transferPoints(UserAccount &fromUser, UserAccount &toUser, int amount) {
-        if (amount <= 0) {
-            std::cout << "Số điểm chuyển phải lớn hơn 0.\n";
+    WalletController(DatabaseManager &db) : db_manager(db) {}
+
+    bool transferPoints(UserAccount &fromUser, UserAccount &toUser, int amount)
+    {
+        if (amount <= 0)
+        {
+            std::cout << "So diem chuyen phai lon hon 0.\n";
             return false;
         }
-        if (wallets[fromUser.username1()] < amount) {
-            std::cout << "Không đủ điểm trong ví.\n";
+        if (db_manager.get_wallet_bal(fromUser.username1()) < amount)
+        {
+            std::cout << "Khong du diem trong vi.\n";
             return false;
         }
 
         std::string otp = OTPManager::generateOTP();
         OTPManager::sendOTP(otp, fromUser.username1());
 
-        std::cout << "Nhập mã OTP để xác nhận chuyển điểm: ";
+        std::cout << "Nhap ma OTP de xac nhan chuyen diem: ";
         std::string userInput;
         std::cin >> userInput;
 
-        if (!OTPManager::validateOTP(userInput, otp)) {
-            std::cout << "Xác thực OTP thất bại. Giao dịch bị hủy.\n";
+        if (!OTPManager::validateOTP(userInput, otp))
+        {
+            std::cout << "Xac thuc OTP that bai. Giao dich bi huy.\n";
             return false;
         }
 
-        wallets[fromUser.username1()] -= amount;
-        wallets[toUser.username1()] += amount;
-        std::cout << "Chuyển thành công " << amount << " điểm từ " << fromUser.username1()
-                << " đến " << toUser.username1() << ".\n";
-        return true;
+        if (db_manager.transfer_bal(fromUser.username1(), toUser.username1(), amount))
+        {
+            std::cout << "Chuyen thanh cong " << amount << " diem tu " << fromUser.username1()
+                      << " den " << toUser.username1() << ".\n";
+            return true;
+        }
+        return false;
     }
 
-    void setWalletBalance(const std::string &username, int balance) {
-        wallets[username] = balance;
+    void setWalletBalance(const std::string &username, int balance)
+    {
+        db_manager.update_wallet_bal(username, balance);
     }
 
-    int getWalletBalance(const std::string &username) {
-        return wallets[username];
+    int getWalletBalance(const std::string &username)
+    {
+        return db_manager.get_wallet_bal(username);
     }
-
-private:
-    std::map<std::string, int> wallets;
 };
 
-
-#endif //WALLETCONTROLLER_H
+#endif // WALLETCONTROLLER_H
