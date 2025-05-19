@@ -26,7 +26,7 @@ public:
             std::cout << "So diem chuyen phai lon hon 0.\n";
             return false;
         }
-        if (db_manager.get_wallet_bal(fromUser.username1()) < amount)
+        if (db_manager.get_wallet_balance(fromUser.username1()) < amount)
         {
             std::cout << "Khong du diem trong vi.\n";
             return false;
@@ -45,7 +45,7 @@ public:
             return false;
         }
 
-        if (db_manager.transfer_bal(fromUser.username1(), toUser.username1(), amount))
+        if (db_manager.transfer_points(fromUser.username1(), toUser.username1(), amount))
         {
             std::cout << "Chuyen thanh cong " << amount << " diem tu " << fromUser.username1()
                       << " den " << toUser.username1() << ".\n";
@@ -56,12 +56,12 @@ public:
 
     void setWalletBalance(const std::string &username, int balance)
     {
-        db_manager.update_wallet_bal(username, balance);
+        db_manager.update_wallet_balance(username, balance);
     }
 
     int getWalletBalance(const std::string &username)
     {
-        return db_manager.get_wallet_bal(username);
+        return db_manager.get_wallet_balance(username);
     }
 };
 
