@@ -73,6 +73,29 @@ void DatabaseManager::init_table()
         }
         sqlite3_finalize(stmt);
     }
+
+    // Create default user account if it doesn't exist
+    string checkUser = "SELECT 1 FROM users WHERE username = 'user2025';";
+    rc = sqlite3_prepare_v2(db, checkUser.c_str(), -1, &stmt, nullptr);
+    if (rc == SQLITE_OK)
+    {
+        if (sqlite3_step(stmt) != SQLITE_ROW)
+        {
+            // Hash the user password
+            string hashedPassword = crypto::Password::hash("user2025");
+
+            // User account doesn't exist, create it
+            string userSql = "INSERT INTO users (username, password, full_name, email, is_admin, force_change_password) "
+                             "VALUES ('user2025', '" +
+                             hashedPassword + "', 'User', 'user@ptit.edu.vn', 0, 0);";
+            exec_sql(userSql);
+
+            // Initialize user wallet
+            string walletSql = "INSERT INTO wallets (username, balance) VALUES ('user2025', 1000);";
+            exec_sql(walletSql);
+        }
+        sqlite3_finalize(stmt);
+    }
 }
 
 bool DatabaseManager::exec_sql(const string &sql)
