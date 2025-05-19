@@ -6,198 +6,265 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "../utils//utils.h"
+#include "../utils/utils.h"
 #include <filesystem>
 
-const static std::string FILENAME = "../users.txt";
-const static std::string FILENAME_TEMP = "../users_tmp.txt";
-const static std::string FILENAME_BACKUP = "../users_backup.txt";
-
-bool UserController::userExists(const std::string& username) {
-    for (int i = 0; i < users.size(); ++i) {
-        if (users[i].username1() == username) {
-            return true;
-        }
-    }
-    return false;
+UserController::UserController() : db_manager("reward_wallet.db")
+{
+    loadUsersFromFile();
 }
 
-void UserController::displayUser(UserAccount user_account) {
+void UserController::loadUsersFromFile()
+{
+    users = db_manager.get_alluser();
+}
+
+void UserController::listAllAccount()
+{
+    if (users.empty())
+    {
+        std::cout << "Khong co tai khoan nao trong he thong.\n";
+        return;
+    }
+    for (const auto &user : users)
+    {
+        displayUser(user);
+    }
+}
+
+void UserController::displayUser(UserAccount user_account)
+{
     std::cout << user_account.toString();
 }
 
-void UserController::listAllAccount() {
-    for (int i = 0; i < users.size(); ++i) {
-        displayUser(users[i]);
-    }
-}
-
-
-bool UserController::createAccountByAdmin(const UserAccount &user) {
-    return createAccount(user);
-}
-
-bool UserController::createAccount(UserAccount user) {
-    if (userExists(user.username1())) {
-        std::cout << "username " << user.username1() << " da ton tai";
+bool UserController::createAccount(UserAccount user)
+{
+    if (db_manager.get_user(user.username1()) != nullptr)
+    {
+        std::cout << "Ten dang nhap '" << user.username1() << "' da ton tai.\n";
         return false;
     }
-    if (user.password1().empty()) {
-        std::string rawPassword = generateRandomPassword();
+
+    // Nếu mật khẩu trống, sinh mật khẩu tự động và yêu cầu đổi mật khẩu
+    if (user.password1().empty())
+    {
+        std::string rawPassword = generateRandomPassword(18);
         std::cout << "Mat khau tu dong duoc sinh: " << rawPassword << std::endl;
         user.set_password(rawPassword);
         user.set_force_change_password(true);
-    } else {
+    }
+    // Nếu người dùng tự nhập mật khẩu, không yêu cầu đổi mật khẩu
+    else
+    {
         user.set_force_change_password(false);
     }
-    backupFile(FILENAME, FILENAME_BACKUP);
 
-    std::ofstream file(FILENAME, std::ios::app);
-    file << user.username1() << "," << user.password1() << ","
-            << user.full_name() << "," << user.email1() << ","
-            << user.point_balance() << "," << user.is_admin() << ","
-            << user.is_active() << "," << user.force_change_password() << "\n";
-    users.push_back(user);
-    std::cout << "tai khoan tao thanh cong" << std::endl;
-    return true;
+    if (db_manager.save_user(user))
+    {
+        users.push_back(user);
+        std::cout << "Tao tai khoan thanh cong!\n";
+        return true;
+    }
+    std::cout << "Khong the tao tai khoan. Vui long thu lai sau.\n";
+    return false;
 }
 
-bool UserController::updatePersonalInfo(UserAccount user, const std::string &newEmail) {
-    std::ifstream file(FILENAME);
-    std::ofstream temp(FILENAME_TEMP);
-    std::string line;
-    bool changed = false;
-
-    for (int i = 0; i < users.size(); ++i) {
-        if (users[i].username1() == user.username1()) {
-            users[i].set_email(newEmail);
-        }
-    }
-
-    while (getline(file, line)) {
-        std::stringstream ss(line);
-
-
-        std::string word;
-        std::pmr::vector<std::string> row;
-        while (std::getline(ss,word, ',')) {
-            row.push_back(word);
-        }
-        bool isAdmin = (row[4] == "1");
-        int balance = std::stoi(row[5]);
-        bool isActive = (row[6] == "1");
-        bool forceChangePassword = (row[7] == "1");
-        std::string email = row[3];
-
-        if (row[0] == user.username1()) {
-            email = newEmail;
-            changed = true;
-        }
-        temp << row[0] << "," << row[1] << "," << row[2] << "," << email << "," << balance << ","
-             << isAdmin << "," << isActive << "," << forceChangePassword << "\n";
-    }
-
-    file.close();
-    temp.close();
-    std::filesystem::remove(FILENAME);
-    std::filesystem::rename(FILENAME_TEMP, FILENAME);
-
-    return changed;
+bool UserController::createAccountByAdmin(const UserAccount &user)
+{
+    return createAccount(user);
 }
 
-UserAccount * UserController::getUserByUsername(const std::string &username) {
-    for (int i = 0; i < users.size(); ++i) {
-        if (users[i].username1() == username) {
-            return &users[i];
-        }
-    }
-    return nullptr;
+bool UserController::userExists(const std::string &username)
+{
+    return db_manager.get_user(username) != nullptr;
 }
 
-bool UserController::changePassword(const UserAccount &user_account) {
+bool UserController::updatePersonalInfo(UserAccount user, const std::string &newEmail)
+{
+    if (newEmail.empty())
+    {
+        std::cout << "Email khong duoc de trong.\n";
+        return false;
+    }
+
+    user.set_email(newEmail);
+    if (db_manager.update_user(user))
+    {
+        for (auto &u : users)
+        {
+            if (u.username1() == user.username1())
+            {
+                u.set_email(newEmail);
+                break;
+            }
+        }
+        std::cout << "Cap nhat thong tin thanh cong!\n";
+        return true;
+    }
+    std::cout << "Khong the cap nhat thong tin. Vui long thu lai sau.\n";
+    return false;
+}
+
+bool UserController::changePasswordWithUsername(const std::string &username, const std::string &oldPass,
+                                                const std::string &newPass, const std::string &reNewPass)
+{
+    if (newPass.empty())
+    {
+        std::cout << "Mat khau moi khong duoc de trong.\n";
+        return false;
+    }
+
+    if (reNewPass != newPass)
+    {
+        std::cout << "Mat khau moi nhap lai khong dung.\n";
+        return false;
+    }
+
+    UserAccount *user = db_manager.get_user(username);
+    if (!user)
+    {
+        std::cout << "Khong tim thay tai khoan.\n";
+        return false;
+    }
+
+    if (user->password1() != oldPass)
+    {
+        std::cout << "Mat khau cu khong dung.\n";
+        delete user;
+        return false;
+    }
+
+    user->set_password(newPass);
+    user->set_force_change_password(false);
+
+    if (db_manager.update_user(*user))
+    {
+        for (auto &u : users)
+        {
+            if (u.username1() == username)
+            {
+                u.set_password(newPass);
+                u.set_force_change_password(false);
+                break;
+            }
+        }
+        std::cout << "Doi mat khau thanh cong!\n";
+        delete user;
+        return true;
+    }
+    std::cout << "Khong the doi mat khau. Vui long thu lai sau.\n";
+    delete user;
+    return false;
+}
+
+bool UserController::changePassword(const UserAccount &user_account)
+{
     std::string oldPass, newPass, reNewPass;
-    std::cout << "Nhap mat khau cu: "; std::cin.ignore(); std::getline(std::cin, oldPass);
-    std::cout << "Nhap mat khau moi: "; std::cin.ignore(); std::getline(std::cin, newPass);
-    std::cout << "Nhap mat lai khau moi: "; std::getline(std::cin, reNewPass);
+
+    std::cout << "Nhap mat khau cu: ";
+    std::getline(std::cin, oldPass);
+
+    std::cout << "Nhap mat khau moi: ";
+    std::getline(std::cin, newPass);
+
+    std::cout << "Nhap lai mat khau moi: ";
+    std::getline(std::cin, reNewPass);
+
     return changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
 }
 
-bool UserController::changePasswordWithUsername(const std::string& username, const std::string& oldPass, const std::string& newPass, const std::string& reNewPass) {
-    if (reNewPass != newPass) {
-        std::cout << "Mat khau moi nhap lai khong dung";
-        return  false;
-    }
-    std::ifstream file(FILENAME);
-    std::ofstream temp(FILENAME_TEMP);
-    std::string line;
-    bool changed = false;
-
-    for (int i = 0; i < users.size(); ++i) {
-        if (users[i].username1() == username) {
-            users[i].set_password(newPass);
-            users[i].set_force_change_password(false);
-        }
+UserAccount *UserController::login(const std::string &username, const std::string &password)
+{
+    if (username.empty() || password.empty())
+    {
+        std::cout << "Ten dang nhap va mat khau khong duoc de trong.\n";
+        return nullptr;
     }
 
-    while (getline(file, line)) {
-        std::stringstream ss(line);
-        std::string word;
-        std::pmr::vector<std::string> row;
-        while (std::getline(ss,word, ',')) {
-            row.push_back(word);
-        }
-        bool isAdmin = (row[4] == "1");
-        int balance = std::stoi(row[5]);
-        bool isActive = (row[6] == "1");
-        bool forceChangePassword = (row[7] == "1");
-        std::string pass = row[1];
-        if (row[0] == username && pass == oldPass) {
-            pass = newPass;
-            forceChangePassword = false;
-            changed = true;
-        }
-        temp << row[0] << "," << pass << "," << row[2] << "," << row[3] << "," << balance << ","
-             << isAdmin << "," << isActive << "," << forceChangePassword << "\n";
+    UserAccount *user = db_manager.get_user(username);
+    if (!user)
+    {
+        std::cout << "Tai khoan khong ton tai.\n";
+        return nullptr;
     }
 
-    file.close();
-    temp.close();
-    std::filesystem::remove(FILENAME);
-    std::filesystem::rename(FILENAME_TEMP, FILENAME);
+    if (user->password1() != password)
+    {
+        std::cout << "Mat khau khong dung.\n";
+        delete user;
+        return nullptr;
+    }
 
-    return changed;
+    return user;
 }
 
-UserAccount* UserController::login(const std::string& username, const std::string& password) {
-    for (auto & user : users) {
-        UserAccount* user_account = &user;
-        if (user_account->username1() == username && user_account->password1() == password) {
-            return user_account;
-        }
+UserAccount *UserController::getUserByUsername(const std::string &username)
+{
+    if (username.empty())
+    {
+        std::cout << "Ten dang nhap khong duoc de trong.\n";
+        return nullptr;
     }
-    return nullptr;
+    return db_manager.get_user(username);
 }
 
-void UserController::loadUsersFromFile() {
-    std::ifstream file(FILENAME);
-    std::ofstream temp(FILENAME_TEMP);
-    std::string line;
+bool UserController::changePasswordWithOTP(UserAccount &user)
+{
+    std::string otp = OTPManager::generateOTP();
+    OTPManager::sendOTP(otp, user.username1());
 
-    while (getline(file, line, '\n')) {
-        std::stringstream ss(line);
-        std::string word;
-        std::pmr::vector<std::string> row;
-        while (std::getline(ss,word, ',')) {
-            row.push_back(word);
-        }
-        bool isAdmin = (row[4] == "1");
-        int balance = std::stoi(row[5]);
-        bool isActive = (row[6] == "1");
-        bool forceChangePassword = (row[7] == "1");
-        UserAccount user(row[0], row[1], row[2], row[3], isAdmin, balance, isActive, forceChangePassword);
-        users.push_back(user);
+    std::cout << "Nhap ma OTP: ";
+    std::string userInput;
+    std::getline(std::cin, userInput);
+
+    if (!OTPManager::validateOTP(userInput, otp))
+    {
+        std::cout << "Ma OTP khong dung. Huy thao tac.\n";
+        return false;
     }
-    file.close();
+
+    std::string newPassword;
+    std::cout << "Nhap mat khau moi: ";
+    std::getline(std::cin, newPassword);
+
+    if (newPassword.empty())
+    {
+        std::cout << "Mat khau moi khong duoc de trong.\n";
+        return false;
+    }
+
+    user.set_password(newPassword);
+    user.set_force_change_password(false);
+
+    if (db_manager.update_user(user))
+    {
+        for (auto &u : users)
+        {
+            if (u.username1() == user.username1())
+            {
+                u.set_password(newPassword);
+                u.set_force_change_password(false);
+                break;
+            }
+        }
+        std::cout << "Doi mat khau thanh cong!\n";
+        return true;
+    }
+    std::cout << "Khong the doi mat khau. Vui long thu lai sau.\n";
+    return false;
 }
 
+std::string UserController::generateRandomPassword(int length)
+{
+    const std::string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    std::random_device rd;
+    std::mt19937 engine(rd());
+    std::uniform_int_distribution<> dist(0, chars.size() - 1);
 
+    std::string password;
+    for (int i = 0; i < length; ++i)
+    {
+        password += chars[dist(engine)];
+    }
+    return password;
+}
