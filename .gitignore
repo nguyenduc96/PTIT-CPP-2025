@@ -1,2 +1,13 @@
 *.pdb
 *.obj
+*cmake*
+*x86*
+*x64*
+*.exe
+*.out
+*.log
+*.log.*
+*.log.*.*
+*.log.*.*.*
+*debug*
+.*
