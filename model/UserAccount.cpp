@@ -7,7 +7,7 @@
 #include <sstream>
 #include <iostream>
 
-UserAccount::UserAccount() : pointBalance(0), isAdmin(false), forceChangePassword(false) {}
+UserAccount::UserAccount() : pointBalance(1000), isAdmin(false), forceChangePassword(false) {}
 
 // Getters
 std::string UserAccount::username1() const { return username; }

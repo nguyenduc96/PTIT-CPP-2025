@@ -13,3 +13,5 @@
 .*
 *.vcxproj
 *.sln
+*.filters
+*.db

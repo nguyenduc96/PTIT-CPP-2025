@@ -105,10 +105,11 @@ private:
                 break;
             case 2:
             {
+                std::cin.ignore();
                 std::string newName, newEmail;
                 std::cout << "Ho ten moi: ";
-                std::cin.ignore();
                 std::getline(std::cin, newName);
+                std::cin.ignore();
                 std::cout << "Email moi: ";
                 std::getline(std::cin, newEmail);
                 // userController.updatePersonalInfo(admin, newName, newEmail);
@@ -185,6 +186,7 @@ private:
                 break;
             case 2:
             {
+                std::cin.ignore();
                 std::string newEmail;
                 std::cout << "Email moi: ";
                 std::getline(std::cin, newEmail);
@@ -193,19 +195,21 @@ private:
             }
             case 3:
             {
+                std::cin.ignore();
                 userController.changePassword(user);
                 break;
             }
             case 4:
-                std::cout << "Số dư ví: " << walletController.getWalletBalance(user.username1()) << " điểm\n";
+                std::cout << "So du vi: " << walletController.getWalletBalance(user.username1()) << " diem\n";
                 break;
             case 5:
             {
+                std::cin.ignore();
                 std::string toUser;
                 int amount;
-                std::cout << "Tài khoản nhận: ";
+                std::cout << "Tai khoan nhan: ";
                 std::cin >> toUser;
-                std::cout << "Số điểm chuyển: ";
+                std::cout << "So diem chuyen: ";
                 std::cin >> amount;
                 if (toUser == user.username1())
                 {
@@ -216,11 +220,11 @@ private:
                 if (receiver)
                     walletController.transferPoints(user, *receiver, amount);
                 else
-                    std::cout << "Người nhận không tồn tại.\n";
+                    std::cout << "Nguoi nhan khong ton tai.\n";
                 break;
             }
             case 0:
-                std::cout << "Đăng xuất.\n";
+                std::cout << "Dang xuat.\n";
                 break;
             default:
                 std::cout << "Lua chon khong hop le.\n";

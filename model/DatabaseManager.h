@@ -28,7 +28,7 @@ public:
     UserAccount *get_user(const string &username);
     vector<UserAccount> get_alluser();
 
-    bool update_wallet_bal(const string &username, int bal);
-    int get_wallet_bal(const string &username);
-    bool transfer_bal(const string &fron_user, const string &to_user, int val);
+    bool update_wallet_balance(const string &username, int balance);
+    int get_wallet_balance(const string &username);
+    bool transfer_points(const string &from_user, const string &to_user, int amount);
 };

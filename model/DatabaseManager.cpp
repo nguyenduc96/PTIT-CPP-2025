@@ -19,7 +19,7 @@ bool DatabaseManager::open_connect()
     int rc = sqlite3_open(db_path.c_str(), &db);
     if (rc)
     {
-        std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Khong the mo database: " << sqlite3_errmsg(db) << std::endl;
         return false;
     }
     return true;
@@ -42,11 +42,10 @@ void DatabaseManager::init_table()
                       "full_name TEXT NOT NULL,"
                       "email TEXT NOT NULL,"
                       "is_admin INTEGER DEFAULT 0,"
-                      "point_balance INTEGER DEFAULT 0,"
                       "force_change_password INTEGER DEFAULT 0);"
                       "CREATE TABLE IF NOT EXISTS wallets ("
                       "username TEXT PRIMARY KEY,"
-                      "balance INTEGER DEFAULT 0,"
+                      "balance INTEGER DEFAULT 1000,"
                       "FOREIGN KEY(username) REFERENCES users(username));";
     exec_sql(sql);
 }
@@ -57,7 +56,7 @@ bool DatabaseManager::exec_sql(const string &sql)
     int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
     if (rc != SQLITE_OK)
     {
-        std::cerr << "SQL error: " << errMsg << std::endl;
+        std::cerr << "Loi SQL: " << errMsg << std::endl;
         sqlite3_free(errMsg);
         return false;
     }
@@ -66,18 +65,18 @@ bool DatabaseManager::exec_sql(const string &sql)
 
 bool DatabaseManager::save_user(const UserAccount &user)
 {
-    string sql = "INSERT INTO users (username, password, full_name, email, is_admin, point_balance, force_change_password) "
+    string sql = "INSERT INTO users (username, password, full_name, email, is_admin, force_change_password) "
                  "VALUES ('" +
                  user.username1() + "', '" + user.password1() + "', '" +
                  user.fullName1() + "', '" + user.email1() + "', " +
-                 std::to_string(user.is_admin()) + ", " + std::to_string(user.pointBalance1()) + ", " +
+                 std::to_string(user.is_admin()) + ", " +
                  std::to_string(user.force_change_password()) + ");";
 
     if (!exec_sql(sql))
         return false;
 
     // Initialize wallet balance
-    sql = "INSERT INTO wallets (username, balance) VALUES ('" + user.username1() + "', 0);";
+    sql = "INSERT INTO wallets (username, balance) VALUES ('" + user.username1() + "', " + std::to_string(user.pointBalance1()) + ");";
     return exec_sql(sql);
 }
 
@@ -92,9 +91,7 @@ bool DatabaseManager::update_user(const UserAccount &user)
                  user.email1() + "', "
                                  "is_admin = " +
                  std::to_string(user.is_admin()) + ", "
-                                                   "point_balance = " +
-                 std::to_string(user.pointBalance1()) + ", "
-                                                        "force_change_password = " +
+                                                   "force_change_password = " +
                  std::to_string(user.force_change_password()) + " "
                                                                 "WHERE username = '" +
                  user.username1() + "';";
@@ -119,7 +116,7 @@ UserAccount *DatabaseManager::get_user(const string &username)
 
     if (rc != SQLITE_OK)
     {
-        std::cerr << "Failed to fetch user: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Khong the lay thong tin nguoi dung: " << sqlite3_errmsg(db) << std::endl;
         return nullptr;
     }
 
@@ -150,7 +147,7 @@ vector<UserAccount> DatabaseManager::get_alluser()
 
     if (rc != SQLITE_OK)
     {
-        std::cerr << "Failed to fetch users: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Khong the lay danh sach nguoi dung: " << sqlite3_errmsg(db) << std::endl;
         return users;
     }
 
@@ -171,14 +168,14 @@ vector<UserAccount> DatabaseManager::get_alluser()
     return users;
 }
 
-bool DatabaseManager::update_wallet_bal(const string &username, int bal)
+bool DatabaseManager::update_wallet_balance(const string &username, int balance)
 {
-    string sql = "UPDATE wallets SET balance = " + std::to_string(bal) +
+    string sql = "UPDATE wallets SET balance = " + std::to_string(balance) +
                  " WHERE username = '" + username + "';";
     return exec_sql(sql);
 }
 
-int DatabaseManager::get_wallet_bal(const string &username)
+int DatabaseManager::get_wallet_balance(const string &username)
 {
     string sql = "SELECT balance FROM wallets WHERE username = '" + username + "';";
     sqlite3_stmt *stmt;
@@ -186,7 +183,7 @@ int DatabaseManager::get_wallet_bal(const string &username)
 
     if (rc != SQLITE_OK)
     {
-        std::cerr << "Failed to fetch wallet balance: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Khong the lay so du vi: " << sqlite3_errmsg(db) << std::endl;
         return -1;
     }
 
@@ -200,20 +197,20 @@ int DatabaseManager::get_wallet_bal(const string &username)
     return balance;
 }
 
-bool DatabaseManager::transfer_bal(const string &from_user, const string &to_user, int val)
+bool DatabaseManager::transfer_points(const string &from_user, const string &to_user, int amount)
 {
-    if (val <= 0)
+    if (amount <= 0)
         return false;
 
-    int from_bal = get_wallet_bal(from_user);
-    if (from_bal < val)
+    int from_balance = get_wallet_balance(from_user);
+    if (from_balance < amount)
         return false;
 
     string sql = "BEGIN TRANSACTION;";
     if (!exec_sql(sql))
         return false;
 
-    sql = "UPDATE wallets SET balance = balance - " + std::to_string(val) +
+    sql = "UPDATE wallets SET balance = balance - " + std::to_string(amount) +
           " WHERE username = '" + from_user + "';";
     if (!exec_sql(sql))
     {
@@ -221,7 +218,7 @@ bool DatabaseManager::transfer_bal(const string &from_user, const string &to_use
         return false;
     }
 
-    sql = "UPDATE wallets SET balance = balance + " + std::to_string(val) +
+    sql = "UPDATE wallets SET balance = balance + " + std::to_string(amount) +
           " WHERE username = '" + to_user + "';";
     if (!exec_sql(sql))
     {

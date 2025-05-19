@@ -48,16 +48,20 @@ bool UserController::createAccount(UserAccount user)
     // Nếu mật khẩu trống, sinh mật khẩu tự động và yêu cầu đổi mật khẩu
     if (user.password1().empty())
     {
-        std::string rawPassword = generateRandomPassword(18);
+        std::string rawPassword = crypto::Password::generateRandom(18);
         std::cout << "Mat khau tu dong duoc sinh: " << rawPassword << std::endl;
-        user.set_password(rawPassword);
+        user.set_password(crypto::Password::hash(rawPassword));
         user.set_force_change_password(true);
     }
     // Nếu người dùng tự nhập mật khẩu, không yêu cầu đổi mật khẩu
     else
     {
+        user.set_password(crypto::Password::hash(user.password1()));
         user.set_force_change_password(false);
     }
+
+    // Thiết lập 1000 điểm mặc định
+    user.set_point_balance(1000);
 
     if (db_manager.save_user(user))
     {
@@ -127,14 +131,14 @@ bool UserController::changePasswordWithUsername(const std::string &username, con
         return false;
     }
 
-    if (user->password1() != oldPass)
+    if (!crypto::Password::verify(oldPass, user->password1()))
     {
         std::cout << "Mat khau cu khong dung.\n";
         delete user;
         return false;
     }
 
-    user->set_password(newPass);
+    user->set_password(crypto::Password::hash(newPass));
     user->set_force_change_password(false);
 
     if (db_manager.update_user(*user))
@@ -143,7 +147,7 @@ bool UserController::changePasswordWithUsername(const std::string &username, con
         {
             if (u.username1() == username)
             {
-                u.set_password(newPass);
+                u.set_password(crypto::Password::hash(newPass));
                 u.set_force_change_password(false);
                 break;
             }
@@ -162,13 +166,19 @@ bool UserController::changePassword(const UserAccount &user_account)
     std::string oldPass, newPass, reNewPass;
 
     std::cout << "Nhap mat khau cu: ";
-    std::getline(std::cin, oldPass);
+    std::cin >> oldPass;
+
+    if (!crypto::Password::verify(oldPass, user_account.password1()))
+    {
+        std::cout << "Mat khau cu khong dung.\n";
+        return false;
+    }
 
     std::cout << "Nhap mat khau moi: ";
-    std::getline(std::cin, newPass);
+    std::cin >> newPass;
 
     std::cout << "Nhap lai mat khau moi: ";
-    std::getline(std::cin, reNewPass);
+    std::cin >> reNewPass;
 
     return changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
 }
@@ -181,6 +191,31 @@ UserAccount *UserController::login(const std::string &username, const std::strin
         return nullptr;
     }
 
+    // Kiem tra do dai ten dang nhap
+    if (username.length() < 3 || username.length() > 20)
+    {
+        std::cout << "Ten dang nhap phai co do dai tu 3 den 20 ky tu.\n";
+        return nullptr;
+    }
+
+    // Kiem tra khoang trang
+    if (username.find(' ') != std::string::npos)
+    {
+        std::cout << "Ten dang nhap khong duoc chua khoang trang.\n";
+        return nullptr;
+    }
+
+    // Kiem tra ky tu dac biet
+    std::string specialChars = "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`";
+    for (char c : username)
+    {
+        if (specialChars.find(c) != std::string::npos)
+        {
+            std::cout << "Ten dang nhap khong duoc chua ky tu dac biet.\n";
+            return nullptr;
+        }
+    }
+
     UserAccount *user = db_manager.get_user(username);
     if (!user)
     {
@@ -188,7 +223,7 @@ UserAccount *UserController::login(const std::string &username, const std::strin
         return nullptr;
     }
 
-    if (user->password1() != password)
+    if (!crypto::Password::verify(password, user->password1()))
     {
         std::cout << "Mat khau khong dung.\n";
         delete user;
@@ -233,7 +268,7 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
         return false;
     }
 
-    user.set_password(newPassword);
+    user.set_password(crypto::Password::hash(newPassword));
     user.set_force_change_password(false);
 
     if (db_manager.update_user(user))
@@ -242,7 +277,7 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
         {
             if (u.username1() == user.username1())
             {
-                u.set_password(newPassword);
+                u.set_password(crypto::Password::hash(newPassword));
                 u.set_force_change_password(false);
                 break;
             }
@@ -256,15 +291,5 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
 
 std::string UserController::generateRandomPassword(int length)
 {
-    const std::string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    std::random_device rd;
-    std::mt19937 engine(rd());
-    std::uniform_int_distribution<> dist(0, chars.size() - 1);
-
-    std::string password;
-    for (int i = 0; i < length; ++i)
-    {
-        password += chars[dist(engine)];
-    }
-    return password;
+    return crypto::Password::generateRandom(length);
 }

@@ -81,7 +81,6 @@ bool DatabaseManager::createUserTable()
                         "full_name TEXT NOT NULL,"
                         "email TEXT NOT NULL,"
                         "is_admin INTEGER NOT NULL,"
-                        "is_active INTEGER NOT NULL,"
                         "force_change_password INTEGER NOT NULL"
                         ");";
 
@@ -101,18 +100,16 @@ bool DatabaseManager::createWalletTable()
 
 bool DatabaseManager::insertUser(const UserAccount &user)
 {
-    std::string query = "INSERT INTO users (username, password, full_name, email, is_admin, is_active, force_change_password) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?);";
+    std::string query = "INSERT INTO users (username, password, full_name, email, is_admin, force_change_password) "
+                        "VALUES (?, ?, ?, ?, ?, ?);";
 
     std::vector<std::string> params = {
         user.username1(),
         user.password1(),
-        user.full_name(),
+        user.fullName1(),
         user.email1(),
         user.is_admin() ? "1" : "0",
-        user.is_active() ? "1" : "0",
-        user.force_change_password() ? "1" : "0"
-    };
+        user.force_change_password() ? "1" : "0"};
 
     if (!executeQueryWithParams(query, params))
     {
@@ -120,28 +117,27 @@ bool DatabaseManager::insertUser(const UserAccount &user)
     }
 
     query = "INSERT INTO wallets (username, balance) VALUES (?, ?);";
-    params = {user.username1(), std::to_string(user.point_balance())};
+    params = {user.username1(), std::to_string(user.pointBalance1())};
 
     return executeQueryWithParams(query, params);
 }
 
 bool DatabaseManager::updateUser(const UserAccount &user)
 {
-    std::string query = "UPDATE users SET password = ?, full_name = ?, email = ?, "
-                        "is_admin = ?, is_active = ?, force_change_password = ? "
-                        "WHERE username = ?;";
-
-    std::vector<std::string> params = {
-        user.password1(),
-        user.full_name(),
-        user.email1(),
-        user.is_admin() ? "1" : "0",
-        user.is_active() ? "1" : "0",
-        user.force_change_password() ? "1" : "0",
-        user.username1()
-    };
-
-    return executeQueryWithParams(query, params);
+    std::string query = "UPDATE users SET "
+                        "password = '" +
+                        user.password1() + "', "
+                                           "full_name = '" +
+                        user.fullName1() + "', "
+                                           "email = '" +
+                        user.email1() + "', "
+                                        "is_admin = " +
+                        std::to_string(user.is_admin()) + ", "
+                                                          "force_change_password = " +
+                        std::to_string(user.force_change_password()) + " "
+                                                                       "WHERE username = '" +
+                        user.username1() + "';";
+    return executeQuery(query);
 }
 
 bool DatabaseManager::updateUserPassword(const std::string &username, const std::string &newPassword, bool forceChange)
@@ -183,7 +179,7 @@ bool DatabaseManager::userExists(const std::string &username)
 UserAccount DatabaseManager::getUserByUsername(const std::string &username)
 {
     sqlite3_stmt *stmt;
-    std::string query = "SELECT username, password, full_name, email, is_admin, is_active, force_change_password "
+    std::string query = "SELECT username, password, full_name, email, is_admin, force_change_password "
                         "FROM users WHERE username = ?;";
 
     int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
@@ -204,12 +200,17 @@ UserAccount DatabaseManager::getUserByUsername(const std::string &username)
         std::string fullName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         std::string email = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         bool isAdmin = sqlite3_column_int(stmt, 4) != 0;
-        bool isActive = sqlite3_column_int(stmt, 5) != 0;
-        bool forceChangePassword = sqlite3_column_int(stmt, 6) != 0;
+        bool forceChangePassword = sqlite3_column_int(stmt, 5) != 0;
 
         int balance = getWalletBalance(username);
 
-        user = UserAccount(username, password, fullName, email, isAdmin, balance, isActive, forceChangePassword);
+        user.set_username(username);
+        user.set_password(password);
+        user.set_full_name(fullName);
+        user.set_email(email);
+        user.set_is_admin(isAdmin);
+        user.set_point_balance(balance);
+        user.set_force_change_password(forceChangePassword);
     }
 
     sqlite3_finalize(stmt);
@@ -220,7 +221,7 @@ std::vector<UserAccount> DatabaseManager::getAllUsers()
 {
     std::vector<UserAccount> users;
     sqlite3_stmt *stmt;
-    std::string query = "SELECT username, password, full_name, email, is_admin, is_active, force_change_password FROM users;";
+    std::string query = "SELECT username, password, full_name, email, is_admin, force_change_password FROM users;";
 
     int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK)
@@ -236,12 +237,19 @@ std::vector<UserAccount> DatabaseManager::getAllUsers()
         std::string fullName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         std::string email = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         bool isAdmin = sqlite3_column_int(stmt, 4) != 0;
-        bool isActive = sqlite3_column_int(stmt, 5) != 0;
-        bool forceChangePassword = sqlite3_column_int(stmt, 6) != 0;
+        bool forceChangePassword = sqlite3_column_int(stmt, 5) != 0;
 
         int balance = getWalletBalance(username);
 
-        users.emplace_back(username, password, fullName, email, isAdmin, balance, isActive, forceChangePassword);
+        UserAccount user;
+        user.set_username(username);
+        user.set_password(password);
+        user.set_full_name(fullName);
+        user.set_email(email);
+        user.set_is_admin(isAdmin);
+        user.set_point_balance(balance);
+        user.set_force_change_password(forceChangePassword);
+        users.push_back(user);
     }
 
     sqlite3_finalize(stmt);
