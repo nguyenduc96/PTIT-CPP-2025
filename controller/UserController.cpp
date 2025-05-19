@@ -119,7 +119,7 @@ bool UserController::changePassword(const UserAccount &user_account) {
     std::cout << "Nhap mat khau cu: "; std::cin.ignore(); std::getline(std::cin, oldPass);
     std::cout << "Nhap mat khau moi: "; std::cin.ignore(); std::getline(std::cin, newPass);
     std::cout << "Nhap mat lai khau moi: "; std::getline(std::cin, reNewPass);
-    changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
+    return changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
 }
 
 bool UserController::changePasswordWithUsername(const std::string& username, const std::string& oldPass, const std::string& newPass, const std::string& reNewPass) {

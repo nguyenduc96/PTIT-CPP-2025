@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\model\UserAccount.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\view\UserView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\controller\UserController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\model\OTPManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\controller\WalletController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\view\CommonPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\utils\FileUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\model\UserAccount.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\view\UserView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\controller\UserController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\utils\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\model\OTPManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\controller\WalletController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\view\CommonPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\utils\FileUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\leson\OneDrive\Documents\GitHub\PTIT-CPP-2025\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{53BFA61B-9B2C-3238-A370-9229FBCA6D5A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9C5E6360-241E-3D8C-8EA0-D459E391503B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
