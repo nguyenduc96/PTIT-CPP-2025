@@ -56,10 +56,10 @@ public:
         std::string password;
         userView.showLoginForm(username, password);
         UserAccount *user = userController.login(username, password);
-        if (user == nullptr)
-        {
-            std::cout << "Sai ten tai khoan hoac mat khau ";
-        }
+        // if (user == nullptr)
+        // {
+        //     std::cout << "Sai ten tai khoan hoac mat khau ";
+        // }
         if (user->force_change_password())
         {
             std::cout << "Tai khoan cua ban can cap nhat mat khau!\n";
