@@ -26,8 +26,6 @@ add_executable(Reward_Wallet main.cpp
         controller/WalletController.h
         view/CommonPage.cpp
         view/CommonPage.h
-        utils/FileUtils.cpp
-        utils/FileUtils.h
         model/DatabaseManager.cpp
         model/DatabaseManager.h
 )

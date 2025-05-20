@@ -83,6 +83,25 @@ bool UserController::userExists(const std::string &username)
     return db_manager.get_user(username) != nullptr;
 }
 
+bool UserController::verifyOtp(std::string otp) {
+    int MAX = 3;
+    bool check = false;
+    do {
+        std::cout << "Nhap ma OTP: ";
+        std::string userInput;
+        std::getline(std::cin, userInput);
+
+        if (!OTPManager::validateOTP(userInput, otp))
+        {
+            MAX--;
+            std::cout << "Ma OTP khong dung. Vui long nhap lai. Ban con " << MAX << " lan!\n";
+        } else {
+            check = true;
+        }
+    } while (MAX > 0 && !check);
+    return check;
+}
+
 bool UserController::updatePersonalInfo(UserAccount user, const std::string &newEmail)
 {
     if (newEmail.empty())
@@ -90,6 +109,11 @@ bool UserController::updatePersonalInfo(UserAccount user, const std::string &new
         std::cout << "Email khong duoc de trong.\n";
         return false;
     }
+
+    std::string otp = OTPManager::generateOTP();
+    OTPManager::sendOTP(otp, user.username1());
+
+    if (!verifyOtp(otp)) return false;
 
     user.set_email(newEmail);
     if (db_manager.update_user(user))
@@ -137,6 +161,11 @@ bool UserController::changePasswordWithUsername(const std::string &username, con
         delete user;
         return false;
     }
+
+    std::string otp = OTPManager::generateOTP();
+    OTPManager::sendOTP(otp, username);
+
+    if (!verifyOtp(otp)) return false;
 
     user->set_password(crypto::Password::hash(newPass));
     user->set_force_change_password(false);
@@ -245,19 +274,6 @@ UserAccount *UserController::getUserByUsername(const std::string &username)
 
 bool UserController::changePasswordWithOTP(UserAccount &user)
 {
-    std::string otp = OTPManager::generateOTP();
-    OTPManager::sendOTP(otp, user.username1());
-
-    std::cout << "Nhap ma OTP: ";
-    std::string userInput;
-    std::getline(std::cin, userInput);
-
-    if (!OTPManager::validateOTP(userInput, otp))
-    {
-        std::cout << "Ma OTP khong dung. Huy thao tac.\n";
-        return false;
-    }
-
     std::string newPassword;
     std::cout << "Nhap mat khau moi: ";
     std::getline(std::cin, newPassword);
@@ -267,6 +283,11 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
         std::cout << "Mat khau moi khong duoc de trong.\n";
         return false;
     }
+
+    std::string otp = OTPManager::generateOTP();
+    OTPManager::sendOTP(otp, user.username1());
+
+    if (!verifyOtp(otp)) return false;
 
     user.set_password(crypto::Password::hash(newPassword));
     user.set_force_change_password(false);
@@ -292,4 +313,41 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
 std::string UserController::generateRandomPassword(int length)
 {
     return crypto::Password::generateRandom(length);
+}
+
+bool UserController::adminUpdateUserWithOTP(UserAccount &user, string newName, string newEmail) {
+    if (newEmail.empty())
+    {
+        std::cout << "Email khong duoc de trong.\n";
+        return false;
+    }
+    if (newName.empty())
+    {
+        std::cout << "Fullname khong duoc de trong.\n";
+        return false;
+    }
+
+    std::string otp = OTPManager::generateOTP();
+    OTPManager::sendOTP(otp, user.username1());
+
+    if (!verifyOtp(otp)) return false;
+
+    user.set_email(newEmail);
+    user.set_full_name(newName);
+    if (db_manager.update_user(user))
+    {
+        for (auto &u : users)
+        {
+            if (u.username1() == user.username1())
+            {
+                u.set_email(newEmail);
+                u.set_full_name(newName);
+                break;
+            }
+        }
+        std::cout << "Cap nhat thong tin thanh cong!\n";
+        return true;
+    }
+    std::cout << "Khong the cap nhat thong tin. Vui long thu lai sau.\n";
+    return false;
 }

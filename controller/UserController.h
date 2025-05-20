@@ -13,6 +13,7 @@
 #include "../model/OTPManager.h"
 #include "../model/DatabaseManager.h"
 #include "../crypto/Password.h"
+using namespace std;
 
 class UserController
 {
@@ -29,6 +30,9 @@ public:
     bool createAccount(UserAccount user);
     bool createAccountByAdmin(const UserAccount &user);
     bool userExists(const std::string &username);
+
+    bool verifyOtp(std::string otp);
+
     bool updatePersonalInfo(UserAccount user, const std::string &newEmail);
     bool changePasswordWithUsername(const std::string &username, const std::string &oldPass,
                                     const std::string &newPass, const std::string &reNewPass);
@@ -36,6 +40,7 @@ public:
     UserAccount *login(const std::string &username, const std::string &password);
     UserAccount *getUserByUsername(const std::string &username);
     bool changePasswordWithOTP(UserAccount &user);
+    bool adminUpdateUserWithOTP(UserAccount &user, string newName, string newEmail);
 };
 
 #endif // USERCONTROLLER_H

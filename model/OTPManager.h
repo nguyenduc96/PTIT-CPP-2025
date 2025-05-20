@@ -23,7 +23,7 @@ public:
 
     static void sendOTP(const std::string &otp, const std::string &receiver)
     {
-        std::cout << "Ma OTP (gui den " << receiver << "): " << otp << std::endl;
+        std::cout << "Gia lap gui OTP.\nMa OTP (gui den " << receiver << "): " << otp << std::endl;
     }
 
     static bool validateOTP(const std::string &userInput, const std::string &otpGenerated)
