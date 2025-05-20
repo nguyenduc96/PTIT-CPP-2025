@@ -132,7 +132,7 @@ private:
                 std::cin.ignore();
                 std::cout << "Email moi: ";
                 std::getline(std::cin, newEmail);
-                // userController.updatePersonalInfo(admin, newName, newEmail);
+                userController.adminUpdateUserWithOTP(admin, newName, newEmail);
                 break;
             }
             case 3:
@@ -173,7 +173,7 @@ private:
                 std::getline(std::cin, newName);
                 std::cout << "Email moi: ";
                 std::getline(std::cin, newEmail);
-                // userController.adminUpdateUserWithOTP(*target, newName, newEmail);
+                userController.adminUpdateUserWithOTP(*target, newName, newEmail);
                 break;
             }
             case 0:

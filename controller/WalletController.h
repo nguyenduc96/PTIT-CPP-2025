@@ -6,8 +6,7 @@
 #define WALLETCONTROLLER_H
 #include <iostream>
 #include <map>
-
-#include "../model/OTPManager.h"
+#include "../model/OTPManager.cpp"
 #include "../model/UserAccount.h"
 #include "../model/DatabaseManager.h"
 
@@ -18,6 +17,25 @@ private:
 
 public:
     WalletController(DatabaseManager &db) : db_manager(db) {}
+
+    bool verifyOtp(std::string otp) {
+        int MAX = 3;
+        bool check = false;
+        do {
+            std::cout << "Nhap ma OTP de xac nhan chuyen diem: ";
+            std::string userInput;
+            std::cin >> userInput;
+
+            if (!OTPManager::validateOTP(userInput, otp))
+            {
+                MAX--;
+                std::cout << "Ma OTP khong dung. Vui long nhap lai. Ban con " << MAX << " lan!\n";
+            } else {
+                check = true;
+            }
+        } while (MAX > 0 && !check);
+        return check;
+    }
 
     bool transferPoints(UserAccount &fromUser, UserAccount &toUser, int amount)
     {
@@ -35,15 +53,7 @@ public:
         std::string otp = OTPManager::generateOTP();
         OTPManager::sendOTP(otp, fromUser.username1());
 
-        std::cout << "Nhap ma OTP de xac nhan chuyen diem: ";
-        std::string userInput;
-        std::cin >> userInput;
-
-        if (!OTPManager::validateOTP(userInput, otp))
-        {
-            std::cout << "Xac thuc OTP that bai. Giao dich bi huy.\n";
-            return false;
-        }
+        if (!verifyOtp(otp)) return false;
 
         if (db_manager.transfer_points(fromUser.username1(), toUser.username1(), amount))
         {
