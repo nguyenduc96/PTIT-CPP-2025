@@ -6,6 +6,8 @@
 #define WALLETCONTROLLER_H
 #include <iostream>
 #include <map>
+
+#include "UserController.h"
 #include "../model/OTPManager.cpp"
 #include "../model/UserAccount.h"
 #include "../model/DatabaseManager.h"
@@ -23,6 +25,7 @@ public:
         bool check = false;
         do {
             std::cout << "Nhap ma OTP de xac nhan chuyen diem: ";
+            std::cin.ignore();
             std::string userInput;
             std::cin >> userInput;
 

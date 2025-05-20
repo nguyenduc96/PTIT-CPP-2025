@@ -261,7 +261,11 @@ private:
                 }
                 UserAccount *receiver = userController.getUserByUsername(toUser);
                 if (receiver)
+                {
                     walletController.transferPoints(user, *receiver, amount);
+                    int latestBalance = walletController.getWalletBalance(user.username1());
+                    user.set_point_balance(latestBalance);
+                }
                 else
                     std::cout << "Nguoi nhan khong ton tai.\n";
                 break;

@@ -5,9 +5,6 @@
 #include "UserController.h"
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include "../utils/utils.h"
-#include <filesystem>
 
 UserController::UserController() : db_manager("reward_wallet.db")
 {

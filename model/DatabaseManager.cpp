@@ -199,7 +199,7 @@ UserAccount *DatabaseManager::get_user(const string &username)
 vector<UserAccount> DatabaseManager::get_alluser()
 {
     vector<UserAccount> users;
-    string sql = "SELECT * FROM users;";
+    string sql = "SELECT u.username, u.password, u.full_name, u.email, u.is_admin, w.balance, u.force_change_password FROM users u JOIN wallets w ON u.username = w.username;";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
 
