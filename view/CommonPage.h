@@ -67,7 +67,7 @@ public:
                 continue;
             }
 
-            UserAccount* user = userController.login(username, password);
+            UserAccount *user = userController.login(username, password);
             if (user == nullptr)
             {
                 std::cout << "Mat khau sai. Vui long kiem tra lai.\n";
@@ -78,9 +78,31 @@ public:
             // Đăng nhập thành công
             if (user->force_change_password())
             {
-                std::cout << "Tai khoan cua ban can cap nhat mat khau!\n";
-                userController.changePassword(*user);
+                std::cout << "\nTai khoan cua ban can cap nhat mat khau!\n";
+                std::cout << "Vui long doi mat khau de tiep tuc.\n";
+                bool passwordChanged = false;
+                while (!passwordChanged)
+                {
+                    if (userController.changePassword(*user))
+                    {
+                        passwordChanged = true;
+                        std::cout << "Doi mat khau thanh cong! Ban co the tiep tuc su dung he thong.\n";
+                    }
+                    else
+                    {
+                        std::cout << "Doi mat khau khong thanh cong. Ban co muon thu lai? (y/n): ";
+                        char choice;
+                        std::cin >> choice;
+                        if (choice != 'y' && choice != 'Y')
+                        {
+                            std::cout << "Ban phai doi mat khau de tiep tuc su dung he thong.\n";
+                            delete user;
+                            return;
+                        }
+                    }
+                }
             }
+
             if (user->is_admin())
             {
                 adminMenu(*user);
@@ -89,6 +111,7 @@ public:
             {
                 normalUserMenu(*user);
             }
+            delete user;
             return;
         }
 

@@ -158,7 +158,7 @@ bool DatabaseManager::delete_user(const string &username)
 
 UserAccount *DatabaseManager::get_user(const string &username)
 {
-    string sql = "SELECT * FROM users WHERE username = '" + username + "';";
+    string sql = "SELECT username, password, full_name, email, is_admin, force_change_password FROM users WHERE username = '" + username + "';";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
 
@@ -176,8 +176,18 @@ UserAccount *DatabaseManager::get_user(const string &username)
         user->set_full_name((const char *)sqlite3_column_text(stmt, 2));
         user->set_email((const char *)sqlite3_column_text(stmt, 3));
         user->set_is_admin(sqlite3_column_int(stmt, 4));
-        user->set_point_balance(sqlite3_column_int(stmt, 5));
-        user->set_force_change_password(sqlite3_column_int(stmt, 6));
+        user->set_force_change_password(sqlite3_column_int(stmt, 5));
+
+        // Lấy số dư từ bảng wallets
+        string walletSql = "SELECT balance FROM wallets WHERE username = '" + username + "';";
+        sqlite3_stmt *walletStmt;
+        rc = sqlite3_prepare_v2(db, walletSql.c_str(), -1, &walletStmt, nullptr);
+        if (rc == SQLITE_OK && sqlite3_step(walletStmt) == SQLITE_ROW)
+        {
+            user->set_point_balance(sqlite3_column_int(walletStmt, 0));
+        }
+        sqlite3_finalize(walletStmt);
+
         sqlite3_finalize(stmt);
         return user;
     }
