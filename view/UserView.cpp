@@ -168,60 +168,15 @@ void UserView::showMessage(const std::string &message)
     std::cout << message << std::endl;
 }
 
-void UserView::showLoginForm(std::string &username, std::string &password)
-{
+void UserView::showLoginForm(std::string &username, std::string &password) {
     std::cout << "===== Dang nhap =====\n";
     std::cout << "Yeu cau ten dang nhap:\n";
     std::cout << "- Do dai tu 3 den 20 ky tu\n";
     std::cout << "- Khong chua khoang trang\n";
     std::cout << "- Khong chua ky tu dac biet\n";
 
-    bool isValidUsername = false;
-    do
-    {
-        std::cout << "Ten dang nhap: ";
-        std::cin >> username;
-
-        // Kiem tra do dai
-        if (username.length() < 3 || username.length() > 20)
-        {
-            std::cout << "Ten dang nhap phai co do dai tu 3 den 20 ky tu.\n";
-            continue;
-        }
-
-        // Kiem tra khoang trang
-        if (username.find(' ') != std::string::npos)
-        {
-            std::cout << "Ten dang nhap khong duoc chua khoang trang.\n";
-            continue;
-        }
-
-        // Kiem tra ky tu dac biet
-        std::string specialChars = "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`";
-        bool hasSpecialChar = false;
-        for (char c : username)
-        {
-            if (specialChars.find(c) != std::string::npos)
-            {
-                hasSpecialChar = true;
-                break;
-            }
-        }
-        if (hasSpecialChar)
-        {
-            std::cout << "Ten dang nhap khong duoc chua ky tu dac biet.\n";
-            continue;
-        }
-
-        // Kiem tra tai khoan ton tai
-        if (!UserController().userExists(username))
-        {
-            std::cout << "Tai khoan khong ton tai. Vui long kiem tra lai.\n";
-            continue;
-        }
-
-        isValidUsername = true;
-    } while (!isValidUsername);
+    std::cout << "Ten dang nhap: ";
+    std::cin >> username;
 
     std::cout << "Mat khau: ";
     std::cin >> password;

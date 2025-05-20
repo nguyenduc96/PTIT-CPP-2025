@@ -52,27 +52,47 @@ public:
 
     void showLoginMenu()
     {
+        int attempts = 0;
+        const int MAX_ATTEMPTS = 3;
         std::string username;
         std::string password;
-        userView.showLoginForm(username, password);
-        UserAccount *user = userController.login(username, password);
-        // if (user == nullptr)
-        // {
-        //     std::cout << "Sai ten tai khoan hoac mat khau ";
-        // }
-        if (user->force_change_password())
+
+        while (attempts < MAX_ATTEMPTS)
         {
-            std::cout << "Tai khoan cua ban can cap nhat mat khau!\n";
-            userController.changePassword(*user);
+            userView.showLoginForm(username, password);
+            if (!userController.userExists(username))
+            {
+                std::cout << "Tai khoan khong ton tai. Vui long kiem tra lai.\n";
+                attempts++;
+                continue;
+            }
+
+            UserAccount* user = userController.login(username, password);
+            if (user == nullptr)
+            {
+                std::cout << "Mat khau sai. Vui long kiem tra lai.\n";
+                attempts++;
+                continue;
+            }
+
+            // Đăng nhập thành công
+            if (user->force_change_password())
+            {
+                std::cout << "Tai khoan cua ban can cap nhat mat khau!\n";
+                userController.changePassword(*user);
+            }
+            if (user->is_admin())
+            {
+                adminMenu(*user);
+            }
+            else
+            {
+                normalUserMenu(*user);
+            }
+            return;
         }
-        if (user->is_admin())
-        {
-            adminMenu(*user);
-        }
-        else
-        {
-            normalUserMenu(*user);
-        }
+
+        std::cout << "Ban da nhap sai qua 3 lan. Quay lai menu chinh.\n";
     }
 
     void registerNewUser()
