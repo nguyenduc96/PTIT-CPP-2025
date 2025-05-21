@@ -390,3 +390,15 @@ bool UserController::adminUpdateUserWithOTP(UserAccount &user, string newName, s
     std::cout << "Khong the cap nhat thong tin. Vui long thu lai sau.\n";
     return false;
 }
+
+void UserController::showTransactionHistory(string fromUser) {
+    vector<TransactionHistory> transaction_histories = db_manager.getAllTransactionByFromUser(fromUser);
+    if (transaction_histories.empty()) {
+        cout << "Nguoi dung " << fromUser << " chua co giao dich nao!\n";
+        return;
+    }
+    cout << "Lich su giao dich nguoi dung " << fromUser << ":\n";
+    for (int i = 0; i < transaction_histories.size(); ++i) {
+        cout << i + 1 << " " << transaction_histories[i].toString();
+    }
+}

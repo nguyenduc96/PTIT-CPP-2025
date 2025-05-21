@@ -28,6 +28,8 @@ add_executable(Reward_Wallet main.cpp
         view/CommonPage.h
         model/DatabaseManager.cpp
         model/DatabaseManager.h
+        model/TransactionHistory.cpp
+        model/TransactionHistory.h
 )
 
 # Link SQLite3

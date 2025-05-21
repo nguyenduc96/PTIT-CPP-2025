@@ -1,6 +1,8 @@
 #pragma once
 #include "../sqlite/sqlite3.h"
 #include <vector>
+
+#include "TransactionHistory.h"
 #include "../model/UserAccount.h"
 
 using namespace std;
@@ -31,4 +33,5 @@ public:
     bool update_wallet_balance(const string &username, int balance);
     int get_wallet_balance(const string &username);
     bool transfer_points(const string &from_user, const string &to_user, int amount);
+    vector<TransactionHistory> getAllTransactionByFromUser(const string &fromUser);
 };

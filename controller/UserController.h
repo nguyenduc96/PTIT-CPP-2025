@@ -41,6 +41,7 @@ public:
     UserAccount *getUserByUsername(const std::string &username);
     bool changePasswordWithOTP(UserAccount &user);
     bool adminUpdateUserWithOTP(UserAccount &user, string newName, string newEmail);
+    void showTransactionHistory(string fromUser);
 };
 
 #endif // USERCONTROLLER_H

@@ -1,5 +1,7 @@
 #include "DatabaseManager.h"
 #include <iostream>
+
+#include "TransactionHistory.h"
 #include "../crypto/Password.h"
 
 using namespace std;
@@ -47,7 +49,13 @@ void DatabaseManager::init_table()
                       "CREATE TABLE IF NOT EXISTS wallets ("
                       "username TEXT PRIMARY KEY,"
                       "balance INTEGER DEFAULT 1000,"
-                      "FOREIGN KEY(username) REFERENCES users(username));";
+                      "FOREIGN KEY(username) REFERENCES users(username));"
+                      "CREATE TABLE IF NOT EXISTS transaction_history("
+                      "transaction_id INTEGER  PRIMARY KEY AUTOINCREMENT,"
+                      "from_user TEXT NOT NULL,"
+                      "to_user TEXT NOT NULL,"
+                      "amount INTEGER NOT NULL,"
+                      "created_at DATETIME DEFAULT (datetime('now')));";
     exec_sql(sql);
 
     // Create default admin account if it doesn't exist
@@ -284,6 +292,38 @@ bool DatabaseManager::transfer_points(const string &from_user, const string &to_
         return false;
     }
 
+    sql = "INSERT INTO transaction_history (from_user, to_user, amount) values ( '" + from_user  + "', '" + to_user + "', " + std::to_string(amount) + ");";
+
+    if (!exec_sql(sql))
+    {
+        exec_sql("ROLLBACK;");
+        return false;
+    }
+
     sql = "COMMIT;";
     return exec_sql(sql);
+}
+
+vector<TransactionHistory> DatabaseManager::getAllTransactionByFromUser(const string &fromUser) {
+    string sql = "select from_user, to_user, amount, created_at from transaction_history where from_user = '" + fromUser + "';";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+    vector<TransactionHistory> transaction_histories;
+    if (rc != SQLITE_OK)
+    {
+        std::cerr << "Khong the lay danh sach giao dich: " << sqlite3_errmsg(db) << std::endl;
+        return transaction_histories;
+    }
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        TransactionHistory transaction;
+        transaction.set_from_user((const char *)sqlite3_column_text(stmt, 0));
+        transaction.set_to_user((const char *)sqlite3_column_text(stmt, 1));
+        transaction.set_amount(sqlite3_column_double(stmt, 2));
+        transaction.set_transaction_time((const char *)sqlite3_column_text(stmt, 3));
+        transaction_histories.push_back(transaction);
+    }
+
+    sqlite3_finalize(stmt);
+    return transaction_histories;
 }

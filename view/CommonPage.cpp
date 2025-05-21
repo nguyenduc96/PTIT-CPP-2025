@@ -119,6 +119,7 @@ void CommonPage::adminMenu(UserAccount &admin)
         std::cout << "3. Tao tai khoan nguoi dung" << std::endl;
         std::cout << "4. Xem danh sach tai khoan" << std::endl;
         std::cout << "5. Chinh sua ho nguoi dung (OTP gui cho ho)" << std::endl;
+        std::cout << "6. Xem lich su giao dich" << std::endl;
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
         std::cin >> choice;
@@ -180,6 +181,13 @@ void CommonPage::adminMenu(UserAccount &admin)
             userController.adminUpdateUserWithOTP(*target, newName, newEmail);
             break;
         }
+        case 6: {
+            std::string uname;
+            std::cout << "Ten tai khoan can xem lich su: ";
+            std::cin >> uname;
+            userController.showTransactionHistory(uname);
+            break;
+        }
         case 0:
             std::cout << "Dang xuat.\n";
             break;
@@ -201,6 +209,7 @@ void CommonPage::normalUserMenu(UserAccount &user)
         std::cout << "3. Doi mat khau" << std::endl;
         std::cout << "4. Xem so du vi" << std::endl;
         std::cout << "5. Chuyen diem" << std::endl;
+        std::cout << "6. Xem lich su giao dich" << std::endl;
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
         std::getline(std::cin, input);
@@ -252,6 +261,10 @@ void CommonPage::normalUserMenu(UserAccount &user)
             }
             else
                 std::cout << "Nguoi nhan khong ton tai.\n";
+            break;
+        }
+        case 6: {
+            userController.showTransactionHistory(user.username1());
             break;
         }
         case 0:
