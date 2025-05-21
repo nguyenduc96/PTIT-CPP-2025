@@ -74,7 +74,7 @@ void CommonPage::showLoginMenu()
                 {
                     std::cout << "Doi mat khau khong thanh cong. Ban co muon thu lai? (y/n): ";
                     char choice;
-                    std::cin.ignore();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                     std::cin >> choice;
                     if (choice != 'y' && choice != 'Y')
                     {
@@ -118,9 +118,8 @@ void CommonPage::adminMenu(UserAccount &admin)
         std::cout << "5. Chinh sua ho nguoi dung (OTP gui cho ho)" << std::endl;
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
-        std::cin.ignore();
         std::cin >> choice;
-
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (choice)
         {
         case 1:
@@ -128,7 +127,7 @@ void CommonPage::adminMenu(UserAccount &admin)
             break;
         case 2:
         {
-            std::cin.ignore();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::string newName, newEmail;
             std::cout << "Ho ten moi: ";
             std::getline(std::cin, newName);
@@ -141,7 +140,7 @@ void CommonPage::adminMenu(UserAccount &admin)
         {
             std::string uname, fname, email;
             std::cout << "Ten dang nhap: ";
-            std::cin.ignore();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cin >> uname;
             std::cout << "Ho ten: ";
             std::getline(std::cin, fname);
@@ -170,7 +169,7 @@ void CommonPage::adminMenu(UserAccount &admin)
                 break;
             }
             std::string newName, newEmail;
-            std::cin.ignore();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Ten moi: ";
             std::getline(std::cin, newName);
             std::cout << "Email moi: ";
@@ -201,6 +200,7 @@ void CommonPage::normalUserMenu(UserAccount &user)
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
         std::cin >> choice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice)
         {
@@ -209,7 +209,6 @@ void CommonPage::normalUserMenu(UserAccount &user)
             break;
         case 2:
         {
-            std::cin.ignore();
             std::string newEmail;
             std::cout << "Email moi: ";
             std::getline(std::cin, newEmail);
@@ -226,7 +225,7 @@ void CommonPage::normalUserMenu(UserAccount &user)
             break;
         case 5:
         {
-            std::cin.ignore();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::string toUser;
             int amount;
             std::cout << "Tai khoan nhan: ";

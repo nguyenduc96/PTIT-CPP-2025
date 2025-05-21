@@ -11,7 +11,7 @@ bool WalletController::verifyOtp(std::string otp)
     {
         std::cout << "Nhap ma OTP de xac nhan chuyen diem: ";
         std::string userInput;
-        std::cin.ignore();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cin >> userInput;
 
         if (!OTPManager::validateOTP(userInput, otp))

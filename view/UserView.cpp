@@ -74,7 +74,7 @@ void UserView::showCreateAccountForm(UserAccount &user)
     std::cout << "- Do dai toi thieu 6 ky tu\n";
     std::cout << "- Chua it nhat 1 chu hoa, 1 chu thuong, 1 so\n";
     std::cout << "Mat khau (bo trong neu muon he thong tu sinh): ";
-    std::cin.ignore();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::string pwd;
     std::getline(std::cin, pwd);
 

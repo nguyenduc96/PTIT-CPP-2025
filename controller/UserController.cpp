@@ -208,7 +208,8 @@ bool UserController::changePassword(const UserAccount &user_account)
     std::string oldPass, newPass, reNewPass;
 
     std::cout << "Nhap mat khau cu: ";
-    std::cin >> oldPass;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, oldPass);
 
     if (!crypto::Password::verify(oldPass, user_account.password1()))
     {
@@ -217,10 +218,10 @@ bool UserController::changePassword(const UserAccount &user_account)
     }
 
     std::cout << "Nhap mat khau moi: ";
-    std::cin >> newPass;
+    std::getline(std::cin, newPass);
 
     std::cout << "Nhap lai mat khau moi: ";
-    std::cin >> reNewPass;
+    std::getline(std::cin, reNewPass);
 
     return changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
 }
@@ -289,7 +290,7 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
 {
     std::string newPassword;
     std::cout << "Nhap mat khau moi: ";
-    std::cin.ignore();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, newPassword);
 
     if (newPassword.empty())
