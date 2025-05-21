@@ -184,7 +184,7 @@ void CommonPage::adminMenu(UserAccount &admin)
         case 6: {
             std::string uname;
             std::cout << "Ten tai khoan can xem lich su: ";
-            std::cin >> uname;
+            std::getline(std::cin, uname);
             userController.showTransactionHistory(uname);
             break;
         }
