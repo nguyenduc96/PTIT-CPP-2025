@@ -1,7 +1,3 @@
-//
-// Created by Dell on 5/9/2025.
-//
-
 #ifndef USERVIEW_H
 #define USERVIEW_H
 

@@ -94,10 +94,10 @@ bool UserController::verifyOtp(std::string otp)
 {
     int MAX = 3;
     bool check = false;
+    std::cin.ignore();
     do
     {
         std::cout << "Nhap ma OTP: ";
-        std::cin.ignore();
         std::string userInput;
         std::getline(std::cin, userInput);
 
@@ -290,6 +290,7 @@ bool UserController::changePasswordWithOTP(UserAccount &user)
 {
     std::string newPassword;
     std::cout << "Nhap mat khau moi: ";
+    std::cin.ignore();
     std::getline(std::cin, newPassword);
 
     if (newPassword.empty())
