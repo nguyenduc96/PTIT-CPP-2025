@@ -3,10 +3,10 @@ Mục tiêu của dự án là hỗ trợ sinh viên Học viện Công nghệ B
 
 
 ## 🔐 Các thành viên tham gia dự án
-- Nguyễn Huỳnh Đức: Xử lý tính năng đăng nhập, view histỏy
-- Nguyễn Hông Sơn: thiết kế database, đăng ký
-- Đỗ Việt Hưng: xử lý đổi mật khẩu, otp
-- Nguyễn Thế Hưng: Xử lý tính năng chuyển tiền
+- Nguyễn Huỳnh Đức - K24DTCN181: Xử lý tính năng đăng nhập, view history
+- Nguyễn Hồng Sơn - K24DTCN225: Thiết kế database, tính năng đăng ký
+- Đỗ Việt Hưng - K24DTCN199 : Xử lý đổi mật khẩu, otp
+- Nguyễn Thế Hưng - K24DTCN198: Xử lý tính năng chuyển tiền, cập nhật thông tin
 
 
 ## 🧩 Tính năng chính
