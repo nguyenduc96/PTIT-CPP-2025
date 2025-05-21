@@ -29,9 +29,18 @@ void UserController::listAllAccount()
     }
 }
 
-void UserController::displayUser(UserAccount user_account)
+void UserController::displayUser(const UserAccount &user_account)
 {
-    std::cout << user_account.toString();
+    UserAccount *fresh_user = db_manager.get_user(user_account.username1());
+    if (fresh_user != nullptr)
+    {
+        std::cout << fresh_user->toString();
+        delete fresh_user;
+    }
+    else
+    {
+        std::cout << "Khong tim thay thong tin nguoi dung.\n";
+    }
 }
 
 bool UserController::createAccount(UserAccount user)

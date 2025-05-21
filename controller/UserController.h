@@ -26,7 +26,7 @@ public:
     UserController();
     void loadUsersFromFile();
     void listAllAccount();
-    void displayUser(UserAccount user_account);
+    void displayUser(const UserAccount &user_account);
     bool createAccount(UserAccount user);
     bool createAccountByAdmin(const UserAccount &user);
     bool userExists(const std::string &username);
