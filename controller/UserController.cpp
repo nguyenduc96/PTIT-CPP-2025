@@ -94,11 +94,10 @@ bool UserController::verifyOtp(std::string otp)
 {
     int MAX = 3;
     bool check = false;
-    std::cin.ignore();
+    std::string userInput;
     do
     {
         std::cout << "Nhap ma OTP: ";
-        std::string userInput;
         std::getline(std::cin, userInput);
 
         if (!OTPManager::validateOTP(userInput, otp))
