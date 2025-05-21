@@ -7,6 +7,7 @@ CommonPage::CommonPage(UserController &uc, WalletController &wc, UserView &usv)
 void CommonPage::showWelcomeMenu()
 {
     int choice;
+    std::string input;
     do
     {
         std::cout << "\n==== CHAO MUNG DEN HE THONG ====" << std::endl;
@@ -14,7 +15,8 @@ void CommonPage::showWelcomeMenu()
         std::cout << "2. Dang ky" << std::endl;
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
-        std::cin >> choice;
+        std::getline(std::cin, input);
+        choice = std::stoi(input);
 
         switch (choice)
         {
@@ -74,8 +76,9 @@ void CommonPage::showLoginMenu()
                 {
                     std::cout << "Doi mat khau khong thanh cong. Ban co muon thu lai? (y/n): ";
                     char choice;
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    std::cin >> choice;
+                    std::string input;
+                    std::getline(std::cin, input);
+                    choice = input[0];
                     if (choice != 'y' && choice != 'Y')
                     {
                         std::cout << "Ban phai doi mat khau de tiep tuc su dung he thong.\n";
@@ -189,6 +192,7 @@ void CommonPage::adminMenu(UserAccount &admin)
 void CommonPage::normalUserMenu(UserAccount &user)
 {
     int choice;
+    std::string input;
     do
     {
         std::cout << "\n==== MENU NGUOI DUNG ====" << std::endl;
@@ -199,8 +203,8 @@ void CommonPage::normalUserMenu(UserAccount &user)
         std::cout << "5. Chuyen diem" << std::endl;
         std::cout << "0. Thoat" << std::endl;
         std::cout << "Chon: ";
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::getline(std::cin, input);
+        choice = std::stoi(input);
 
         switch (choice)
         {
@@ -209,10 +213,12 @@ void CommonPage::normalUserMenu(UserAccount &user)
             break;
         case 2:
         {
-            std::string newEmail;
+            std::string newName, newEmail;
+            std::cout << "Ho ten moi: ";
+            std::getline(std::cin, newName);
             std::cout << "Email moi: ";
             std::getline(std::cin, newEmail);
-            userController.updatePersonalInfo(user, newEmail);
+            userController.updatePersonalInfo(user, newName, newEmail);
             break;
         }
         case 3:
@@ -225,13 +231,13 @@ void CommonPage::normalUserMenu(UserAccount &user)
             break;
         case 5:
         {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::string toUser;
             int amount;
             std::cout << "Tai khoan nhan: ";
-            std::cin >> toUser;
+            std::getline(std::cin, toUser);
             std::cout << "So diem chuyen: ";
-            std::cin >> amount;
+            std::getline(std::cin, input);
+            amount = std::stoi(input);
             if (toUser == user.username1())
             {
                 std::cout << "Ban khong the chuyen tien cho chinh minh";

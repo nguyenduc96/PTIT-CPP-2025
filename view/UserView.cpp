@@ -168,16 +168,22 @@ void UserView::showMessage(const std::string &message)
     std::cout << message << std::endl;
 }
 
-void UserView::showLoginForm(std::string &username, std::string &password) {
-    std::cout << "===== Dang nhap =====\n";
-    std::cout << "Yeu cau ten dang nhap:\n";
-    std::cout << "- Do dai tu 3 den 20 ky tu\n";
-    std::cout << "- Khong chua khoang trang\n";
-    std::cout << "- Khong chua ky tu dac biet\n";
-
+void UserView::showLoginForm(std::string &username, std::string &password)
+{
+    std::cout << "\n==== DANG NHAP ====" << std::endl;
     std::cout << "Ten dang nhap: ";
-    std::cin >> username;
+    std::getline(std::cin, username);
+    while (username.empty())
+    {
+        std::cout << "Ten dang nhap khong duoc de trong. Vui long nhap lai: ";
+        std::getline(std::cin, username);
+    }
 
     std::cout << "Mat khau: ";
-    std::cin >> password;
+    std::getline(std::cin, password);
+    while (password.empty())
+    {
+        std::cout << "Mat khau khong duoc de trong. Vui long nhap lai: ";
+        std::getline(std::cin, password);
+    }
 }

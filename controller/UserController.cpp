@@ -113,11 +113,16 @@ bool UserController::verifyOtp(std::string otp)
     return check;
 }
 
-bool UserController::updatePersonalInfo(UserAccount user, const std::string &newEmail)
+bool UserController::updatePersonalInfo(UserAccount user, const std::string &newName, const std::string &newEmail)
 {
     if (newEmail.empty())
     {
         std::cout << "Email khong duoc de trong.\n";
+        return false;
+    }
+    if (newName.empty())
+    {
+        std::cout << "Ho ten khong duoc de trong.\n";
         return false;
     }
 
@@ -128,6 +133,7 @@ bool UserController::updatePersonalInfo(UserAccount user, const std::string &new
         return false;
 
     user.set_email(newEmail);
+    user.set_full_name(newName);
     if (db_manager.update_user(user))
     {
         for (auto &u : users)
@@ -135,6 +141,7 @@ bool UserController::updatePersonalInfo(UserAccount user, const std::string &new
             if (u.username1() == user.username1())
             {
                 u.set_email(newEmail);
+                u.set_full_name(newName);
                 break;
             }
         }
@@ -208,8 +215,12 @@ bool UserController::changePassword(const UserAccount &user_account)
     std::string oldPass, newPass, reNewPass;
 
     std::cout << "Nhap mat khau cu: ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, oldPass);
+    while (oldPass.empty())
+    {
+        std::cout << "Mat khau khong duoc de trong. Vui long nhap lai: ";
+        std::getline(std::cin, oldPass);
+    }
 
     if (!crypto::Password::verify(oldPass, user_account.password1()))
     {
@@ -219,9 +230,19 @@ bool UserController::changePassword(const UserAccount &user_account)
 
     std::cout << "Nhap mat khau moi: ";
     std::getline(std::cin, newPass);
+    while (newPass.empty())
+    {
+        std::cout << "Mat khau khong duoc de trong. Vui long nhap lai: ";
+        std::getline(std::cin, newPass);
+    }
 
     std::cout << "Nhap lai mat khau moi: ";
     std::getline(std::cin, reNewPass);
+    while (reNewPass.empty())
+    {
+        std::cout << "Mat khau khong duoc de trong. Vui long nhap lai: ";
+        std::getline(std::cin, reNewPass);
+    }
 
     return changePasswordWithUsername(user_account.username1(), oldPass, newPass, reNewPass);
 }

@@ -33,7 +33,7 @@ public:
 
     bool verifyOtp(std::string otp);
 
-    bool updatePersonalInfo(UserAccount user, const std::string &newEmail);
+    bool updatePersonalInfo(UserAccount user, const std::string &newName, const std::string &newEmail);
     bool changePasswordWithUsername(const std::string &username, const std::string &oldPass,
                                     const std::string &newPass, const std::string &reNewPass);
     bool changePassword(const UserAccount &user_account);
