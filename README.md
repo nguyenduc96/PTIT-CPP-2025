@@ -3,10 +3,10 @@ Mục tiêu của dự án là hỗ trợ sinh viên Học viện Công nghệ B
 
 
 ## 🔐 Các thành viên tham gia dự án
-Nguyễn Huỳnh Đức:
-Nguyễn Hông Sơn:
-Đỗ Việt Hưng:
-Nguyễn Thế Hưng:
+- Nguyễn Huỳnh Đức: Xử lý tính năng đăng nhập, view histỏy
+- Nguyễn Hông Sơn: thiết kế database, đăng ký
+- Đỗ Việt Hưng: xử lý đổi mật khẩu, otp
+- Nguyễn Thế Hưng: Xử lý tính năng chuyển tiền
 
 
 ## 🧩 Tính năng chính
@@ -25,10 +25,11 @@ Sử dụng cơ sở dữ liệu SQLite tích hợp
   - Mật khẩu: ptit2025
 
 - *User*
-  - Tên đăng nhập: user
-  - Mật khẩu: user
+  - Tên đăng nhập: user2025
+  - Mật khẩu: user2025
 
 ## 🗂 Cấu trúc thư mục
+```
 ├── controller/ # Xử lý logic nghiệp vụ
 ├── model/ # Định nghĩa cấu trúc dữ liệu và truy vấn SQLite
 ├── view/ # Giao diện dòng lệnh
@@ -38,6 +39,7 @@ Sử dụng cơ sở dữ liệu SQLite tích hợp
 ├── main.cpp # Điểm khởi đầu của chương trình
 ├── CMakeLists.txt # Tập tin cấu hình CMake
 └── README.md # Tài liệu mô tả dự án
+```
 
 ## 🛠 Hướng dẫn cài đặt và chạy
 
